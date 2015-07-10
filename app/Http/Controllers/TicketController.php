@@ -93,10 +93,6 @@ class TicketController extends ApiController
 
     public function stats(Cache $cache)
     {
-        $tickets = Ticket::withTrashed()->get();
-        $openTickets = $tickets->filter(function($ticket) {
-            return !$ticket->trashed();
-        });
         if (! $cache->has('tickets.total') && ! $cache->has('tickets.open'))
         {
             return $this->responseNoteFound('No stats found');
