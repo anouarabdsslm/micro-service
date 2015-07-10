@@ -8,6 +8,7 @@ use Illuminate\Support\ServiceProvider;
 use Zendesk\API\Client;
 class ZendeskServiceProvider extends ServiceProvider
 {
+    protected $defer = true;
     /**
      * Bootstrap the application services.
      *

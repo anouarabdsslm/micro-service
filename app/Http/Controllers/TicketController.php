@@ -6,6 +6,7 @@ use App\Http\Controllers\ApiController;
 use App\Http\Requests;
 use App\Ticket;
 use App\Transformers\TicketTransformer;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Http\Request;
 
 class TicketController extends ApiController
@@ -90,31 +91,21 @@ class TicketController extends ApiController
         return $this->respondSuccess();
     }
 
-    public function stats()
+    public function stats(Cache $cache)
     {
         $tickets = Ticket::withTrashed()->get();
         $openTickets = $tickets->filter(function($ticket) {
             return !$ticket->trashed();
         });
+        if (! $cache->has('tickets.total') && ! $cache->has('tickets.open'))
+        {
+            return $this->responseNoteFound('No stats found');
+        }
         return $this->respond([
                 'tickets' => [
-                    'open' => $openTickets->count(),
-                    'total' => $tickets->count()
+                    'open' => $cache->get('tickets.open') ,
+                    'total' => $cache->get('tickets.total') 
                 ]
             ]);
-    }
-    private function addToZendesk(Request $request)
-    {
-        return $this->zendesk->create([
-            "subject" => $request->input('subject'),
-            "comment" => [
-                "body" => $request->input('body')
-            ],
-            "requester" => [
-                "name" => $request->input('name'), 
-                "email" => $request->input('email')
-            ],
-            'priority' => 'normal'
-        ]);
     }
 }

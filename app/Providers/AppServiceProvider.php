@@ -18,7 +18,7 @@ class AppServiceProvider extends ServiceProvider
         //On the creation time add ticket to our Zendesk API ,
         //then set the zendesk ID
         Ticket::creating(function ($ticket) use($sendesk){
-            //We may fire an event here
+            //We may throw this to the queue
             $newTicket = $sendesk->create([
                 "subject" => $ticket->subject,
                 "comment" => [
@@ -33,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
             $ticket->zendesk_ticket_id = $newTicket->id;
         });
         Ticket::deleting(function ($ticket) use($sendesk){
-            //We may fire an event here
+            //We may throw this to the queue
             $sendesk->solved($ticket->zendesk_ticket_id);
         });
 
