@@ -140,11 +140,10 @@ return [
         /*
          * Application Service Providers...
          */
+        App\Providers\ZendeskServiceProvider::class,
         App\Providers\AppServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        App\Providers\ZendeskServiceProvider::class,
-
     ],
 
     /*
