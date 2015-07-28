@@ -27,7 +27,7 @@ class TicketControllerTest extends TestCase
     /** @test */
     public function it_fetch_tickets_as_json()
     {
-        factory(Ticket::class)->create();
+        factory(Ticket::class, 5)->create();
         $this->ticketTransformer->shouldReceive('transformCollection')->once();
         $this->get('/v1/tickets')
              ->seeJson();
