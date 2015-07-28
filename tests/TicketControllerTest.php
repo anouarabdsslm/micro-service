@@ -8,13 +8,13 @@ use Illuminate\Foundation\Testing\WithoutMiddleware;
 class TicketControllerTest extends TestCase
 {
     use DatabaseTransactions;
+
     private $ticketTransformer;
     private $zendesk;
     public function setUp()
     {
       parent::setUp();
       $this->ticketTransformer = $this->mock(TicketTransformer::class);
-      $tickets = factory(Ticket::class)->create();
     }
       
     public function mock($class)
@@ -27,6 +27,7 @@ class TicketControllerTest extends TestCase
     /** @test */
     public function it_fetch_tickets_as_json()
     {
+        factory(Ticket::class)->create();
         $this->ticketTransformer->shouldReceive('transformCollection')->once();
         $this->get('/v1/tickets')
              ->seeJson();
@@ -36,6 +37,7 @@ class TicketControllerTest extends TestCase
    /** @test */
     public function it_fetch_single_ticket_as_json()
     {
+        factory(Ticket::class, 5)->create();
         $this->ticketTransformer->shouldReceive('transform')->once();
         $this->get('/v1/tickets/3')
                 ->seeJson();
