@@ -14,6 +14,7 @@ class TicketControllerTest extends TestCase
     {
       parent::setUp();
       $this->ticketTransformer = $this->mock(TicketTransformer::class);
+      $tickets = factory(Ticket::class)->create();
     }
       
     public function mock($class)

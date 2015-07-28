@@ -4,17 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\ApiController;
 use App\Http\Requests;
+use App\Jobs\CreateTicket;
+use App\Jobs\SolveTicket;
 use App\Ticket;
 use App\Transformers\TicketTransformer;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Http\Request;
+ use App\Contracts\Ticket as TicketInterface;
 
 class TicketController extends ApiController
 {
     private $ticketTransformer;
     private $zendesk;
-    function __construct(TicketTransformer $ticketTransformer) {
+    function __construct(TicketTransformer $ticketTransformer, TicketInterface $sendesk) {
         $this->ticketTransformer = $ticketTransformer;
+        $this->sendesk = $sendesk;
     }
     /**
      * Display a listing of the resource.
@@ -46,12 +50,13 @@ class TicketController extends ApiController
         }
         //Sometimes we return the new created resource 
         //For now let go with status info only 
-        Ticket::create([
+        $ticket = Ticket::create([
                 "name" => $request->input('name'), 
                 "email" => $request->input('email'),
                 'subject' => $request->input('subject'),
                 'body' => $request->input('body')
             ]);
+        $this->dispatch(new CreateTicket($ticket, $this->sendesk));
         return $this->respondSuccess();
     }
 
@@ -87,6 +92,7 @@ class TicketController extends ApiController
         {
             return $this->responseNoteFound();
         }
+        $this->dispatch(new SolveTicket($ticket, $this->sendesk));
         $ticket->delete();
         return $this->respondSuccess();
     }
